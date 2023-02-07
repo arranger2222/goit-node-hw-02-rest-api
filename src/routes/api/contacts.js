@@ -19,30 +19,34 @@ const {
   deleteContactByIdController,
 } = require('../../controllers/contactsController');
 
-const ctrlWrapper = require('../../helpers/ctrlWrapper');
+const tryCatchWrapper = require('../../helpers/tryCatchWrapper');
 
-router.get('/', ctrlWrapper(getContactsController));
+const { authMiddleware } = require('../../middlewares/authMiddleware');
 
-router.get('/:contactId', ctrlWrapper(getContactByIdController));
+router.use(authMiddleware);
+
+router.get('/', tryCatchWrapper(getContactsController));
+
+router.get('/:contactId', tryCatchWrapper(getContactByIdController));
 
 router.post(
   '/',
   validateBody(addContactSchema),
-  ctrlWrapper(createContactController)
+  tryCatchWrapper(createContactController)
 );
 
 router.put(
   '/:contactId',
   validateBody(updateContactSchema),
-  ctrlWrapper(updateContactByIdController)
+  tryCatchWrapper(updateContactByIdController)
 );
 
 router.patch(
   '/:contactId/favorite',
   validateBody(toggleFavoriteSchema),
-  ctrlWrapper(toggleFavoriteByIdController)
+  tryCatchWrapper(toggleFavoriteByIdController)
 );
 
-router.delete('/:contactId', ctrlWrapper(deleteContactByIdController));
+router.delete('/:contactId', tryCatchWrapper(deleteContactByIdController));
 
 module.exports = router;
