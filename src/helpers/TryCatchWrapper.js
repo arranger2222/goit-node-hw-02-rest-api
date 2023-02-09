@@ -1,4 +1,4 @@
-const TryCatchWrapper = controller => {
+const tryCatchWrapper = controller => {
   return async (req, res, next) => {
     try {
       await controller(req, res, next);
@@ -8,4 +8,4 @@ const TryCatchWrapper = controller => {
   };
 };
 
-module.exports = TryCatchWrapper;
+module.exports = tryCatchWrapper;

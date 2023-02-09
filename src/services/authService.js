@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const gravatar = require('gravatar');
 const User = require('../models/user');
 
 const { JWT_SECRET } = process.env;
@@ -6,7 +7,9 @@ const { JWT_SECRET } = process.env;
 const signup = async (email, password, subscription) => {
   if (await User.findOne({ email })) return null;
 
-  const newUser = new User({ email, password, subscription });
+  const avatarURL = gravatar.url(email);
+
+  const newUser = new User({ email, password, subscription, avatarURL });
   await newUser.hashPassword(password);
   newUser.save();
 

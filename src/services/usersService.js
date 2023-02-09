@@ -20,4 +20,12 @@ const updateSubscription = async (userId, subscription) => {
   return user;
 };
 
-module.exports = { getCurrent, updateSubscription };
+const updateAvatar = async (userId, avatarURL) => {
+  const user = await User.findByIdAndUpdate(userId, { avatarURL }).catch(() => {
+    return null;
+  });
+
+  return user;
+};
+
+module.exports = { getCurrent, updateSubscription, updateAvatar };

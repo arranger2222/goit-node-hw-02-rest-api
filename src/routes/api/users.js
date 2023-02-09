@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 
 const { authMiddleware } = require('../../middlewares/authMiddleware');
+const { uploadMiddleware } = require('../../middlewares/uploadMiddleware');
 
 const { subscriptionSchema } = require('../../schemas/validationUserSchema');
 const { userSchema } = require('../../schemas/validationUserSchema');
@@ -16,30 +17,29 @@ const {
 const {
   getCurrentController,
   updateSubscriptionController,
+  updateAvatarController,
 } = require('../../controllers/usersController');
 
-const TryCatchWrapper = require('../../helpers/TryCatchWrapper');
+const ctrlWrapper = require('../../helpers/tryCatchWrapper');
 
-router.post(
-  '/register',
-  validateBody(userSchema),
-  TryCatchWrapper(signupController)
-);
+router.post('/signup', validateBody(userSchema), ctrlWrapper(signupController));
 
-router.post(
-  '/login',
-  validateBody(userSchema),
-  TryCatchWrapper(loginController)
-);
+router.post('/login', validateBody(userSchema), ctrlWrapper(loginController));
 
-router.get('/logout', authMiddleware, TryCatchWrapper(logoutController));
+router.get('/logout', authMiddleware, ctrlWrapper(logoutController));
 
-router.get('/current', TryCatchWrapper(getCurrentController));
+router.get('/current', ctrlWrapper(getCurrentController));
 
 router.patch(
   '/',
   [authMiddleware, validateBody(subscriptionSchema)],
-  TryCatchWrapper(updateSubscriptionController)
+  ctrlWrapper(updateSubscriptionController)
+);
+
+router.patch(
+  '/avatars',
+  [authMiddleware, uploadMiddleware.single('avatar')],
+  ctrlWrapper(updateAvatarController)
 );
 
 module.exports = router;
