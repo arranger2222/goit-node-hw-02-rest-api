@@ -5,12 +5,17 @@ const router = express.Router();
 const { authMiddleware } = require('../../middlewares/authMiddleware');
 const { uploadMiddleware } = require('../../middlewares/uploadMiddleware');
 
-const { subscriptionSchema } = require('../../schemas/validationUserSchema');
-const { userSchema } = require('../../schemas/validationUserSchema');
+const {
+  userSchema,
+  subscriptionSchema,
+  resendEmailSchema,
+} = require('../../schemas/validationUserSchema');
 const { validateBody } = require('../../middlewares/validateBody');
 
 const {
   signupController,
+  verificationEmailController,
+  resendEmailController,
   loginController,
   logoutController,
 } = require('../../controllers/authController');
@@ -20,26 +25,45 @@ const {
   updateAvatarController,
 } = require('../../controllers/usersController');
 
-const ctrlWrapper = require('../../helpers/tryCatchWrapper');
+const tryCatchWrapper = require('../../helpers/tryCatchWrapper');
 
-router.post('/signup', validateBody(userSchema), ctrlWrapper(signupController));
+router.post(
+  '/signup',
+  validateBody(userSchema),
+  tryCatchWrapper(signupController)
+);
 
-router.post('/login', validateBody(userSchema), ctrlWrapper(loginController));
+router.get(
+  '/verify/:verificationToken',
+  tryCatchWrapper(verificationEmailController)
+);
 
-router.get('/logout', authMiddleware, ctrlWrapper(logoutController));
+router.post(
+  '/verify',
+  validateBody(resendEmailSchema),
+  tryCatchWrapper(resendEmailController)
+);
 
-router.get('/current', ctrlWrapper(getCurrentController));
+router.post(
+  '/login',
+  validateBody(userSchema),
+  tryCatchWrapper(loginController)
+);
+
+router.get('/logout', authMiddleware, tryCatchWrapper(logoutController));
+
+router.get('/current', tryCatchWrapper(getCurrentController));
 
 router.patch(
   '/',
   [authMiddleware, validateBody(subscriptionSchema)],
-  ctrlWrapper(updateSubscriptionController)
+  tryCatchWrapper(updateSubscriptionController)
 );
 
 router.patch(
   '/avatars',
   [authMiddleware, uploadMiddleware.single('avatar')],
-  ctrlWrapper(updateAvatarController)
+  tryCatchWrapper(updateAvatarController)
 );
 
 module.exports = router;
